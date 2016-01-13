@@ -19,7 +19,7 @@ done
 
 ### Commonly-used functions
 * `mkdata FILENAME` - Create or add to the db directory (`$BORTLIB_DATADIR`) using the contents of the named file
-* `store_line` - Store a single line of input into the db
+* `store_line WORDS` - Store a single line of input into the db
 * `linefromwords WORDS` - Generate some random output seeded by some words
 * `randomline` - Generate a completely random line
 
