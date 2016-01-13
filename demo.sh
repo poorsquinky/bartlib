@@ -1,10 +1,10 @@
 #!/bin/bash
 
 INFILE=raw-data.txt
-DATADIR=bort-data
+BORTLIB_DATADIR=bort-data
 source bortlib.sh
 
-[[ -d $DATADIR ]] || mkdata $INFILE
+[[ -d $BORTLIB_DATADIR ]] || mkdata $INFILE
 
 while read LINE; do
     linefromwords $LINE
