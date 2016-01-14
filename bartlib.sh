@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if (which rl >/dev/null 2>&1); then
-    BORTLIB_RANDOMLINE=rl
+    BARTLIB_RANDOMLINE=rl
 else
-    BORTLIB_RANDOMLINE="shuf -n 1"
+    BARTLIB_RANDOMLINE="shuf -n 1"
 fi
 
 getwords () {
@@ -11,9 +11,9 @@ getwords () {
         PREVWORD="$1"
         THISWORD="$2"
         CLEANWORD=$(cleantext "$THISWORD")
-        FILENAME="${BORTLIB_DATADIR}/${CLEANWORD}"
+        FILENAME="${BARTLIB_DATADIR}/${CLEANWORD}"
         if [[ -f $FILENAME ]]; then
-            NEXTWORD=$(grep "^${PREVWORD} " "$FILENAME" | $BORTLIB_RANDOMLINE | awk '{ print $2 }')
+            NEXTWORD=$(grep "^${PREVWORD} " "$FILENAME" | $BARTLIB_RANDOMLINE | awk '{ print $2 }')
             if [[ ! -z $NEXTWORD && $NEXTWORD != "__END" ]]; then
                 echo -n " $NEXTWORD"
                 getwords "$THISWORD" "$NEXTWORD"
@@ -27,9 +27,9 @@ backwords () {
         THISWORD="$1"
         NEXTWORD="$2"
         CLEANWORD=$(cleantext "$THISWORD")
-        FILENAME="${BORTLIB_DATADIR}/${CLEANWORD}"
+        FILENAME="${BARTLIB_DATADIR}/${CLEANWORD}"
         if [[ -f $FILENAME ]]; then
-            PREVWORD=$(grep " ${NEXTWORD}$" "$FILENAME" | $BORTLIB_RANDOMLINE | awk '{ print $1 }')
+            PREVWORD=$(grep " ${NEXTWORD}$" "$FILENAME" | $BARTLIB_RANDOMLINE | awk '{ print $1 }')
             if [[ ! -z $PREVWORD && $PREVWORD != "__START" ]]; then
                 backwords "$PREVWORD" "$THISWORD"
                 echo -n "$PREVWORD "
@@ -41,7 +41,7 @@ backwords () {
 searchword () {
     SEARCHWORD=$1
     CLEANWORD=$(cleantext "$SEARCHWORD")
-    FILENAME="${BORTLIB_DATADIR}/${CLEANWORD}"
+    FILENAME="${BARTLIB_DATADIR}/${CLEANWORD}"
     if [[ -f $FILENAME ]]; then
         SEED=$(shuf "$FILENAME" | head -1)
         if [[ $( echo "$SEED" | wc -w ) == 2 ]]; then
@@ -73,7 +73,7 @@ linefromwords () {
 }
 
 randomline () {
-    FIRSTWORD=$(shuf ${BORTLIB_DATADIR}/__START | head -1 | awk '{ print $2 }')
+    FIRSTWORD=$(shuf ${BARTLIB_DATADIR}/__START | head -1 | awk '{ print $2 }')
     OUT="$FIRSTWORD"
     echo -n "$FIRSTWORD"
     getwords "__START" "$FIRSTWORD"
@@ -95,8 +95,8 @@ store_line () {
         WORD3="$WORD"
         CLEANWORD=$(cleantext "$WORD2")
         if [[ -z $WORD2 || ! -z $CLEANWORD ]]; then
-            WORDFILE="${BORTLIB_DATADIR}/${CLEANWORD}"
-            [[ -z $WORD2 ]] && WORDFILE="${BORTLIB_DATADIR}/__START"
+            WORDFILE="${BARTLIB_DATADIR}/${CLEANWORD}"
+            [[ -z $WORD2 ]] && WORDFILE="${BARTLIB_DATADIR}/__START"
             if [[ -z $WORD1 ]]; then
                 echo "__START $WORD3" >> $WORDFILE
             else
@@ -105,11 +105,11 @@ store_line () {
         fi
     done
     CLEANWORD=$(cleantext "$WORD3")
-    [[ ! -z $CLEANWORD ]] && echo "$WORD2 __END" >> "${BORTLIB_DATADIR}/${CLEANWORD}"
+    [[ ! -z $CLEANWORD ]] && echo "$WORD2 __END" >> "${BARTLIB_DATADIR}/${CLEANWORD}"
 }
 
 mkdata () {
-    mkdir -p "${BORTLIB_DATADIR}"
+    mkdir -p "${BARTLIB_DATADIR}"
     while read LINE; do
         store_line "$LINE"
     done < <(sed -E -e 's/  +/ /' $1)
