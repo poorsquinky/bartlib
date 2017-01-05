@@ -6,7 +6,11 @@ source bartlib.sh
 
 [[ -d $BARTLIB_DATADIR ]] || mkdata $INFILE
 
+randomline
+
 while read LINE; do
-    linefromwords $LINE
+    OUT=$(linefromwords $LINE)
+    [[ -z $OUT ]] && OUT=$(randomline)
+    echo $OUT
 done
 

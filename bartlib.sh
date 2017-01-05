@@ -13,7 +13,7 @@ getwords () {
         CLEANWORD=$(cleantext "$THISWORD")
         FILENAME="${BARTLIB_DATADIR}/${CLEANWORD}"
         if [[ -f $FILENAME ]]; then
-            NEXTWORD=$(grep "^${PREVWORD} " "$FILENAME" | $BARTLIB_RANDOMLINE | awk '{ print $2 }')
+            NEXTWORD=$(grep -iE ".*${PREVWORD}.* " "$FILENAME" | $BARTLIB_RANDOMLINE | awk '{ print $2 }')
             if [[ ! -z $NEXTWORD && $NEXTWORD != "__END" ]]; then
                 echo -n " $NEXTWORD"
                 getwords "$THISWORD" "$NEXTWORD"
@@ -29,7 +29,7 @@ backwords () {
         CLEANWORD=$(cleantext "$THISWORD")
         FILENAME="${BARTLIB_DATADIR}/${CLEANWORD}"
         if [[ -f $FILENAME ]]; then
-            PREVWORD=$(grep " ${NEXTWORD}$" "$FILENAME" | $BARTLIB_RANDOMLINE | awk '{ print $1 }')
+            PREVWORD=$(grep -i " .*${NEXTWORD}.*" "$FILENAME" | $BARTLIB_RANDOMLINE | awk '{ print $1 }')
             if [[ ! -z $PREVWORD && $PREVWORD != "__START" ]]; then
                 backwords "$PREVWORD" "$THISWORD"
                 echo -n "$PREVWORD "
@@ -81,7 +81,23 @@ randomline () {
 }
 
 cleantext () {
-    echo "$@" | tr A-Z a-z | sed -E -e 's/  +/ /g' -e "s/[^-=,'0-9a-z]//g"
+    case "$@" in
+        '&'|'+'|"[Aa]n'"|"'n'")
+            echo "and"
+            ;;
+        "[Tt]h'")
+            echo "the"
+            ;;
+        "[Oo]'")
+            echo "of"
+            ;;
+        *"in'")
+            echo "$@" | sed -e "s/in'/ing/"
+            ;;
+        *)
+            echo "$@" | tr A-Z a-z | sed -E -e 's/  +/ /g' -e "s/[^-=,'0-9a-z]//g"
+            ;;
+    esac
 }
 
 store_line () {
