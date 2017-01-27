@@ -20,6 +20,7 @@ done
 ### Commonly-used functions
 * `mkdata FILENAME` - Create or add to the db directory (`$BARTLIB_DATADIR`) using the contents of the named file
 * `store_line WORDS` - Store a single line of input into the db
-* `linefromwords WORDS` - Generate some random output seeded by some words
+* `linefromwords WORDS` - Generate some random output seeded by one of the given words at random
+* `searchphrase WORDS` - Build output based on the phrase provided verbatim, not just one random word from it
 * `randomline` - Generate a completely random line
 

@@ -13,7 +13,7 @@ getwords () {
         CLEANWORD=$(cleantext "$THISWORD")
         FILENAME="${BARTLIB_DATADIR}/${CLEANWORD}"
         if [[ -f $FILENAME ]]; then
-            NEXTWORD=$(grep -iE "[#@]*[a-z]*${PREVWORD}[a-z]* " "$FILENAME" | $BARTLIB_RANDOMLINE | awk '{ print $2 }')
+            NEXTWORD=$(grep -iE "[#@]*[a-z]*$(searchable "$PREVWORD")[a-z]* " "$FILENAME" | $BARTLIB_RANDOMLINE | awk '{ print $2 }')
             if [[ ! -z $NEXTWORD && $NEXTWORD != "__END" ]]; then
                 echo -n " $NEXTWORD"
                 getwords "$THISWORD" "$NEXTWORD"
@@ -29,7 +29,7 @@ backwords () {
         CLEANWORD=$(cleantext "$THISWORD")
         FILENAME="${BARTLIB_DATADIR}/${CLEANWORD}"
         if [[ -f $FILENAME ]]; then
-            PREVWORD=$(grep -i " [#@]*[a-z]*${NEXTWORD}[a-z]*" "$FILENAME" | $BARTLIB_RANDOMLINE | awk '{ print $1 }')
+            PREVWORD=$(grep -i " [#@]*[a-z]*$(searchable "$NEXTWORD")[a-z]*" "$FILENAME" | $BARTLIB_RANDOMLINE | awk '{ print $1 }')
             if [[ ! -z $PREVWORD && $PREVWORD != "__START" ]]; then
                 backwords "$PREVWORD" "$THISWORD"
                 echo -n "$PREVWORD "
@@ -61,6 +61,13 @@ searchword () {
     fi
 }
 
+searchphrase () {
+    PHRASE=$@
+    backwords $PHRASE
+    echo -n "$PHRASE"
+    getwords $(echo "$PHRASE" | awk '{ print $(NF-1) }') $(echo "$PHRASE" | awk '{ print $NF }')
+}
+
 linefromwords () {
     IN=$(echo $@ | sed -E -e 's/  +/ /g')
     WC=$(echo $IN | wc -w)
@@ -80,6 +87,11 @@ randomline () {
     echo
 }
 
+searchable() {
+    echo "$@" | sed -E \
+        -e 's/([().*?\[\]])/\\\1/g'
+}
+
 cleantext () {
     case "$@" in
         '&'|'+'|"[Aa]n'"|"'n'")
@@ -95,7 +107,7 @@ cleantext () {
             echo "$@" | sed -e "s/in'/ing/"
             ;;
         *)
-            echo "$@" | tr A-Z a-z | sed -E -e 's/  +/ /g' -e "s/[^-=,.!?'0-9a-z]//g" -e 's/^\.+//g' -e 's/([!?])/\\\1/g'
+            echo "$@" | tr A-Z a-z | sed -E -e 's/  +/ /g' -e "s/[^-=,:.!?'0-9a-z]//g" -e 's/^\.+//g' -e 's/([!?])/\\\1/g'
             ;;
     esac
 }
